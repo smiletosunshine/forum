@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password, check_password
 
-from user.models import User
+from user.models import User,Role
 from user.forms import RegisterForm
 
 
@@ -13,6 +13,8 @@ def register(request):
             user = form.save(commit=False)
             user.password = make_password(user.password)
             user.save()
+
+            Role.add_perm(user.id,'user')
             # 写入 session 数据
             request.session['uid'] = user.id
             request.session['nickname'] = user.nickname

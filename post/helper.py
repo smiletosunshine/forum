@@ -12,7 +12,6 @@ def page_cache(timeout):
         def wrap2(request, *args, **kwargs):
             key = 'Response-%s' % request.get_full_path()
             response = cache.get(key)
-            print('get from cache:', response)
 
             # 添加阅读计数
             if response and view_func.__name__ == 'read_post':
@@ -21,7 +20,6 @@ def page_cache(timeout):
             if response is None:
                 response = view_func(request, *args, **kwargs)
                 cache.set(key, response, timeout)
-                print('get from view:', response)
 
             return response
         return wrap2

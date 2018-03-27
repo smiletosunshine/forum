@@ -1,23 +1,19 @@
 # coding: utf8
 
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 
-from user.models import User, Permission
+from user.models import User
 
 
 def check_perm(need_perm):
     def wrap1(view_func):
         def wrap2(request, *args, **kwargs):
             uid = request.session.get('uid')
-            if uid is None:
-                level = 1
-            else:
+            try:
                 user = User.objects.get(id=uid)
-                level = user.perm.level
-
-            # 检查权限
-            perm = Permission.objects.get(name=need_perm)  # 获取对应权限的实例
-            if level >= perm.level:
+            except User.DoesNotExist as e:
+                return redirect('/')
+            if user.has_perm(need_perm):
                 return view_func(request, *args, **kwargs)
             else:
                 return render(request, 'blockers.html')
